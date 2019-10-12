@@ -181,13 +181,17 @@ class Payone_Core_Block_Checkout_Onepage_Payment_Methods
     public function getSelectedMethodCode()
     {
         if ($codeMethod = parent::getSelectedMethodCode()) {
-            $sessionCodeMethod = Mage::getModel('sales/quote')
-                ->load(Mage::getSingleton('checkout/session')->getQuoteId())
-                ->getPayment()
-                ->getMethodInstance()
-                ->getCode();
-            if ($codeMethod != $sessionCodeMethod) {
-                return $sessionCodeMethod;
+            try {
+                $sessionCodeMethod = Mage::getModel('sales/quote')
+                    ->load(Mage::getSingleton('checkout/session')->getQuoteId())
+                    ->getPayment()
+                    ->getMethodInstance()
+                    ->getCode();
+                if ($codeMethod != $sessionCodeMethod) {
+                    return $sessionCodeMethod;
+                }
+            } catch (Exception $e) {
+                Mage::logException($e);  
             }
         }
         return parent::getSelectedMethodCode();
